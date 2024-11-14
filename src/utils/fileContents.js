@@ -1,4 +1,4 @@
-import { isPropertiesOrYML, getYMLData, getPropertiesData, scanModelDirectory } from "./index.js";
+import { isPropertiesOrYML, getYMLData, getPropertiesData, scanModelDirectory } from "./helper.js";
 import fs from "fs";
 import path from "path";
 
