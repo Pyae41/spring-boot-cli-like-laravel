@@ -1,16 +1,18 @@
 import fs from "fs";
 import path from "path";
 import chalk from 'chalk';
+import figlet from "figlet";
+import boxen from "boxen";
 import prReader from "properties-reader";
 import ymlReader from "js-yaml";
-import { 
-    modelFileContent, 
-    controllerFileContent, 
-    seederFileContent, 
-    seederConfigFileContent, 
-    seederManagerFileContent, 
-    serviceFileContent, 
-    serviceImplFileContent, 
+import {
+    modelFileContent,
+    controllerFileContent,
+    seederFileContent,
+    seederConfigFileContent,
+    seederManagerFileContent,
+    serviceFileContent,
+    serviceImplFileContent,
     repoFileContent,
     globalCommandLineRunnerFileContent
 } from "./fileContents.js";
@@ -21,8 +23,8 @@ export const checkMvnOrGradle = () => {
 
     // Check for Maven or Gradle files
     const pomPath = path.join(directory, 'pom.xml');
-    
-    if (fs.existsSync(pomPath)){
+
+    if (fs.existsSync(pomPath)) {
         return "mvn";
     }
     else {
@@ -88,16 +90,16 @@ export const getMainJavaPackageAsPath = () => {
         const match = content.match(packageRegex);
         if (match && match[1]) {
             const fullPackage = match[1];
-            
+
             let mainPackage = "";
 
             fullPackage.split('.').map((pack) => {
-               mainPackage += pack + "/"; 
+                mainPackage += pack + "/";
             });
 
             // remove last "/"
             mainPackage = mainPackage.slice(0, -1);
-        
+
             mainPackages.add(mainPackage);
         }
     });
@@ -106,7 +108,7 @@ export const getMainJavaPackageAsPath = () => {
     return mainPackages.values().next().value;
 }
 export const getMainJavaPackageAsClassPath = () => {
-   return getMainJavaPackageAsPath().replaceAll("/",".");
+    return getMainJavaPackageAsPath().replaceAll("/", ".");
 }
 
 export const generateModelFile = (name) => {
@@ -158,21 +160,21 @@ export const isPropertiesOrYML = () => {
     const applicationYMLFilePath = path.join(resourcesPath, "application.yml");
 
     let result = "";
-    if(!fs.existsSync(resourcesPath)) {
+    if (!fs.existsSync(resourcesPath)) {
         console.log(`${chalk.red.bold('⚠')} Resources folder not found.`)
         return;
     }
-    if(fs.existsSync(applicationPropertiesFilePath)) {
+    if (fs.existsSync(applicationPropertiesFilePath)) {
         result = "properties";
     }
-    else if(fs.existsSync(applicationYMLFilePath)) {
+    else if (fs.existsSync(applicationYMLFilePath)) {
         result = "yml";
     }
     else {
         console.log(`${chalk.red.bold('⚠')} application.properties or .yml file not found.`);
         return;
     }
-    
+
     return result;
 }
 
@@ -182,8 +184,8 @@ export const scanModelDirectory = () => {
     const modelPath = srcJavaPath + "/" + getMainJavaPackageAsPath() + "/model";
     const modelFiles = [];
 
-    if(fs.existsSync(modelPath)) {
-        const files = fs.readdirSync(modelPath);    
+    if (fs.existsSync(modelPath)) {
+        const files = fs.readdirSync(modelPath);
         files.forEach((file) => {
             modelFiles.push(file.split(".")[0].toLowerCase());
         });
@@ -195,7 +197,7 @@ export const getPropertiesData = () => {
     const resourcesPath = path.join(process.cwd(), "src", "main", "resources");
     const applicationPropertiesFilePath = path.join(resourcesPath, "application.properties");
 
-    if(fs.existsSync(applicationPropertiesFilePath)) {
+    if (fs.existsSync(applicationPropertiesFilePath)) {
         return prReader(applicationPropertiesFilePath);
     }
 
@@ -204,7 +206,7 @@ export const getYMLData = () => {
     const resourcesPath = path.join(process.cwd(), "src", "main", "resources");
     const applicationPropertiesFilePath = path.join(resourcesPath, "application.yml");
 
-    if(fs.existsSync(applicationPropertiesFilePath)) {
+    if (fs.existsSync(applicationPropertiesFilePath)) {
         const fileContents = fs.readFileSync(applicationPropertiesFilePath, 'utf-8');
         return ymlReader.load(fileContents);
     }
@@ -219,29 +221,29 @@ const generateJavaFile = (name, type, content) => {
     const captilizedType = captializeFirstLetter(modifiedType);
     let concatName = name;
     type.split("/").map((str) => {
-        if(modifiedType == "model") return;
-        else if(!concatName.includes(captilizedType)) concatName += captilizedType
+        if (modifiedType == "model") return;
+        else if (!concatName.includes(captilizedType)) concatName += captilizedType
         else concatName += captializeFirstLetter(str);
     });
     const createFileName = concatName;
 
     console.log(`Creating ${type.toLowerCase()} ${chalk.green(name + '...')}`);
-    
+
     // check path and file exist
     const configFilePath = `${javaSrcPath}/${getMainJavaPackageAsPath()}/config`;
-    if(!fs.existsSync(configFilePath)) {
+    if (!fs.existsSync(configFilePath)) {
 
-        fs.mkdirSync(configFilePath, { recursive: true});
+        fs.mkdirSync(configFilePath, { recursive: true });
 
-        if(!fs.existsSync(`${configFilePath}/seeder`)){
-            fs.mkdirSync(`${configFilePath}/seeder`, { recursive: true});
+        if (!fs.existsSync(`${configFilePath}/seeder`)) {
+            fs.mkdirSync(`${configFilePath}/seeder`, { recursive: true });
             createSeederConfigFiles(`${configFilePath}/seeder`);
-        }    
-        
+        }
+
         createGlobalCommandLineConfigFile(configFilePath);
     }
 
-    if(!fs.existsSync(pathToCreateFile)) fs.mkdirSync(pathToCreateFile, { recursive: true});
+    if (!fs.existsSync(pathToCreateFile)) fs.mkdirSync(pathToCreateFile, { recursive: true });
     if (fs.existsSync(`${pathToCreateFile}/${createFileName}.java`)) {
         console.log(`${chalk.yellow.bold('⚠')}  ${createFileName} already exists`);
         return;
@@ -259,8 +261,8 @@ const createSeederConfigFiles = (path) => {
     const seederInterfaceConfigContent = seederConfigFileContent(classPath);
     const seederManagerContent = seederManagerFileContent(classPath);
 
-    fs.writeFile(`${pathToCreateFile}/Seeder.java`, seederInterfaceConfigContent,() => {});
-    fs.writeFile(`${pathToCreateFile}/SeederManager.java`, seederManagerContent,() => {});
+    fs.writeFile(`${pathToCreateFile}/Seeder.java`, seederInterfaceConfigContent, () => { });
+    fs.writeFile(`${pathToCreateFile}/SeederManager.java`, seederManagerContent, () => { });
 }
 
 const createGlobalCommandLineConfigFile = (path) => {
@@ -268,5 +270,43 @@ const createGlobalCommandLineConfigFile = (path) => {
     const classPath = getMainJavaPackageAsClassPath();
     const globalCommandLineRunnerContent = globalCommandLineRunnerFileContent(classPath);
 
-    fs.writeFile(`${pathToCreateFile}/GlobalCommandLineRunner.java`, globalCommandLineRunnerContent,() => {});
+    fs.writeFile(`${pathToCreateFile}/GlobalCommandLineRunner.java`, globalCommandLineRunnerContent, () => { });
+}
+
+export const generateAsciiSpringBootCLIText = () => {
+    // Generate ASCII art for "Spring" and "Boot" and "CLI"
+    const springArt = figlet.textSync('Spring', { horizontalLayout: 'default', font: 'Small' });
+    const bootArt = figlet.textSync('Boot', { horizontalLayout: 'default', font: 'Small' });
+    const cliArt = figlet.textSync('CLI', { horizontalLayout: 'default', font: 'Small' });
+
+    // Split ASCII art into lines
+    const springLines = springArt.split('\n');
+    const bootLines = bootArt.split('\n');
+    const cliLines = cliArt.split('\n');
+
+    // Check arrays of lines have the same length
+    const maxLength = Math.max(springLines.length, bootLines.length, cliLines.length);
+    while (springLines.length < maxLength) springLines.push(' '.repeat(springLines[0].length));
+    while (bootLines.length < maxLength) bootLines.push(' '.repeat(bootLines[0].length));
+    while (cliLines.length < maxLength) cliLines.push(' '.repeat(cliLines[0].length));
+
+    // Combine the two ASCII art line by line
+    const combinedArt = springLines.map((line, i) => `${chalk.green(line)}  ${chalk.magenta(bootLines[i])} ${chalk.white(cliLines[i])}`).join('\n');
+
+    // Output the combined ASCII art
+    return "\n" + combinedArt + "\n";
+}
+
+export const generateBoxedText = (version) => {
+    const textForBoxed = `\nCLI like ${chalk.red.bold("LARAVEL")} for ${chalk.green.bold("SPRING")} ${chalk.magenta.bold("BOOT")}\n`;
+    const boxenOptions = {
+        padding: 1,
+        margin: 1,
+        borderColor: 'green',
+        borderStyle: 'classic',
+        title: `version (${version})`,
+        titleAlignment: 'center'
+    };
+
+    return boxen(textForBoxed, boxenOptions);
 }

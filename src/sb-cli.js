@@ -3,6 +3,8 @@ import { Command } from "commander";
 import { 
    captializeFirstLetter,
    checkMvnOrGradle,
+   generateAsciiSpringBootCLIText,
+   generateBoxedText,
    generateControllerFile,
    generateModelFile,
    generateRepoFile,
@@ -17,35 +19,37 @@ import { execFileSync } from "child_process";
 
 const program = new Command();
 
-let serveProcess;
+const aciiArt = generateAsciiSpringBootCLIText();
+
+const boxedText = generateBoxedText("1.0.0");
 
 const globalCommand = program
 .name("sb")
 .description("CLI like laravel for spring boot")
-.version(`CLI like ${chalk.red.bold("LARAVEL")} for ${chalk.green.bold("SPRING")} ${chalk.magenta.bold("BOOT")}\nversion: 1.0.0`, '-v, --version', 'output the current version');
+.version(boxedText, '-v, --version', 'output the current version');
 
 globalCommand.helpInformation = () => {
-  return `CLI like ${chalk.red.bold("LARAVEL")} for ${chalk.green.bold("SPRING")} ${chalk.magenta.bold("BOOT")}
+  return `${aciiArt}${boxedText}
   
-Usage: sb [command] [options]
+  ${chalk.magenta.bold('Usage: sb [command] [options]')}
 
+  Options:
+    -v, --version                          Display the current version
+    -h, --help                             Display help for command
 
-Options:
-  -v, --version                          Display the current version
-  -h, --help                             Display help for command
-
-Commands:
-  serve                                  Run application
-  make:model <name> [options]            To create model file.
-  make:repository <name>                 To create repository file.
-  make:service <name>                    To create services file.
-  make:controller <name> [options]       To create controller file.
-  make:seeder <name> [options]           To create seeder file.
-  make:pivot <model1> model2>            To create pivot file.
-  db:seed                                Seeding seeder files
-  [command] -h, --help                   Display help for command
+  Commands:
+    serve                                  Run application
+    make:model <name> [options]            To create model file.
+    make:repository <name>                 To create repository file.
+    make:service <name>                    To create services file.
+    make:controller <name> [options]       To create controller file.
+    make:seeder <name> [options]           To create seeder file.
+    make:pivot <model1> model2>            To create pivot file.
+    db:seed                                Seeding seeder files
+    [command] -h, --help                   Display help for command\n
 `
 }
+
 
 // make model command
 const makeModelCommand = program
@@ -86,17 +90,19 @@ const makeModelCommand = program
     }
 })
 makeModelCommand.helpInformation = () => {
-  return `Usage: sb make:model <name> [options]
+  return `${aciiArt}${boxedText}
 
-To create model file.
+  ${chalk.magenta.bold('Usage: sb make:model <name> [options]')}
 
-Options:
-  -c, --controller         Generate a controller file for model
-  -repo, --repository      Generate a repository file for model
-  -srv, --service          Generate a service file for model
-  -s, --seeder             Generate a seeder file for model
-  -r, --resource           Generate all files require for API
-  -h, --help               Helps for a command
+  To create model file.
+
+  Options:
+    -c, --controller         Generate a controller file for model
+    -repo, --repository      Generate a repository file for model
+    -srv, --service          Generate a service file for model
+    -s, --seeder             Generate a seeder file for model
+    -r, --resource           Generate all files require for API
+    -h, --help               Display help for command\n
 `
 };
 
@@ -109,7 +115,6 @@ const makeController = program
 .action((name, options) => {
   if(isSpringbootProject()){
     const captilized = captializeFirstLetter(name.toLowerCase());
-    const checkModelExist = scanModelDirectory();
     if (options.controller) {
       generateControllerFile(captilized, "controller");
     }
@@ -121,14 +126,16 @@ const makeController = program
 });
 
 makeController.helpInformation = () => {
-  return `Usage: sb make:controller <name> [options]
+  return `${aciiArt}${boxedText}
+  
+  ${chalk.magenta.bold('Usage: sb make:controller <name> [options]')}
 
-To create controller file.
+  To create controller file.
 
-Options:
-  -c, --controller         Generate a rest controller file with CRUD and fetching methods
-  -r, --resource           Generate a rest controller file with CRUD and fetching methods
-  -h, --help               Helps for a command
+  Options:
+    -c, --controller         Generate a rest controller file with CRUD and fetching methods
+    -r, --resource           Generate a rest controller file with CRUD and fetching methods
+    -h, --help               Display help for command\n
 `;
 }
 
@@ -146,12 +153,14 @@ const makeServiceCommand = program
   }
 });
 makeServiceCommand.helpInformation = () => {
-  return `Usage: sb make:service <name>
+  return `${aciiArt}${boxedText}
+  
+  ${chalk.magenta.bold('Usage: sb make:service <name>')}
+  
+  To create service file.
 
-To create service file.
-
-Options:
-  -h, --help      Helps for a command
+  Options:
+    -h, --help      Display help for command\n
 `;
 }
 
@@ -169,12 +178,14 @@ const makeRepoCommand = program
   }
 });
 makeRepoCommand.helpInformation = () => {
-  return `Usage: sb make:repository <name>
+  return `${aciiArt}${boxedText}
+  
+  ${chalk.magenta.bold('Usage: sb make:repository <name>')}
 
-To create repository file.
+  To create repository file.
 
-Options:
-  -h, --help      Helps for a command
+  Options:
+    -h, --help      Display help for command\n
 `;
 }
 
@@ -194,12 +205,14 @@ const makeSeederCommand = program
   }
 });
 makeSeederCommand.helpInformation = () => {
-  return `Usage: sb make:seeder <name>
+  return `${aciiArt}${boxedText}
+  
+  ${chalk.magenta.bold('Usage: sb make:seeder <name>')}
 
-To create seeder file.
+  To create seeder file.
 
-Options:
-  -h, --help      Helps for a command
+  Options:
+    -h, --help      Display help for command\n
 `;
 }
 
@@ -237,13 +250,15 @@ const makePivotCommand = program
   }
 });
 makePivotCommand.helpInformation = () => {
-  return `Usage: sb make:pivot <model1> <model2>
+  return `${aciiArt}${boxedText}
+  
+  ${chalk.magenta.bold('Usage: sb make:pivot <model1> <model2>')}
 
-To create pivot file.
+  To create pivot file.
 
-Options:
-  -s, --seeder    Generate a seeder file for pivot
-  -h, --help      Helps for a command
+  Options:
+    -s, --seeder    Generate a seeder file for pivot
+    -h, --help      Display help for command\n
 `;
 }
 
@@ -277,13 +292,15 @@ const runSeederCommand = program
   }
 });
 runSeederCommand.helpInformation = () => {
-  return `Usage: sb db:seed
+  return `${aciiArt}${boxedText}
+  
+  ${chalk.magenta.bold('Usage: sb db:seed')}
 
-To create pivot file.
+  To create pivot file.
 
-Options:
-  --seeder=<name>    Run a specific seeder
-  -h, --help         Helps for a command
+  Options:
+    --seeder=<name>    Run a specific seeder
+    -h, --help         Display help for command\n
 `;
 }
 
@@ -314,13 +331,15 @@ const serveCommand = program
   }
 });
 serveCommand.helpInformation = () => {
-  return `Usage: sb serve [options]
+  return `${aciiArt}${boxedText}
+  
+  ${chalk.magenta.bold('Usage: sb serve [options]')}
 
-Run Application
+  Run Application
 
-Options:
-  --port=<port>       Server Port
-  -h, --help          Helps for a command
+  Options:
+    --port=<port>       Server Port
+    -h, --help          Display help for command\n
 `;
 }
 
