@@ -13,7 +13,7 @@ import {
    getMainJavaPackageAsPath, 
    isSpringbootProject, 
    scanModelDirectory
-} from "./utils/index.js";
+} from "./utils/helper.js";
 import chalk from "chalk";
 import { execFileSync } from "child_process";
 
