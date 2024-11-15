@@ -406,7 +406,7 @@ const initSpringBoot = program
         message: 'Enter the artifact ID (e.g., demo):',
         default: 'demo',
         validate: (input) => {
-          const regex = /^[a-zA-Z]$/;
+          const regex = /^[a-zA-Z]+$/;
           return regex.test(input) || "Please enter a valid artifactId like example"
         }
       },
