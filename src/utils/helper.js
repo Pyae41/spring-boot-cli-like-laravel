@@ -1,10 +1,13 @@
 import fs from "fs";
+import fsExtra from "fs-extra";
 import path from "path";
 import chalk from 'chalk';
 import figlet from "figlet";
 import boxen from "boxen";
 import prReader from "properties-reader";
 import ymlReader from "js-yaml";
+import AdmZip from "adm-zip";
+import { execSync } from "child_process";
 import {
     modelFileContent,
     controllerFileContent,
@@ -50,7 +53,6 @@ export const isSpringbootProject = () => {
     } else if (fs.existsSync(gradlePath) || fs.existsSync(gradleKtsPath) && fs.existsSync(srcJavaPath) && fs.existsSync(srcResourcesPath)) {
         return true;
     } else {
-        console.log(`${chalk.yellow.bold('⚠')}  Make sure you are in spring boot project.`);
         return false;
     }
 }
@@ -213,6 +215,70 @@ export const getYMLData = () => {
 
 }
 
+export const generateAsciiSpringBootCLIText = () => {
+    // Generate ASCII art for "Spring" and "Boot" and "CLI"
+    const springArt = figlet.textSync('Spring', { horizontalLayout: 'default', font: 'Small' });
+    const bootArt = figlet.textSync('Boot', { horizontalLayout: 'default', font: 'Small' });
+    const cliArt = figlet.textSync('CLI', { horizontalLayout: 'default', font: 'Small' });
+
+    // Split ASCII art into lines
+    const springLines = springArt.split('\n');
+    const bootLines = bootArt.split('\n');
+    const cliLines = cliArt.split('\n');
+
+    // Check arrays of lines have the same length
+    const maxLength = Math.max(springLines.length, bootLines.length, cliLines.length);
+    while (springLines.length < maxLength) springLines.push(' '.repeat(springLines[0].length));
+    while (bootLines.length < maxLength) bootLines.push(' '.repeat(bootLines[0].length));
+    while (cliLines.length < maxLength) cliLines.push(' '.repeat(cliLines[0].length));
+
+    // Combine the two ASCII art line by line
+    const combinedArt = springLines.map((line, i) => `${chalk.green(line)}  ${chalk.magenta(bootLines[i])} ${chalk.white(cliLines[i])}`).join('\n');
+
+    // Output the combined ASCII art
+    return "\n" + combinedArt + "\n";
+}
+
+export const generateBoxedText = (version) => {
+    const textForBoxed = `\nCLI like ${chalk.red.bold("LARAVEL")} for ${chalk.green.bold("SPRING")} ${chalk.magenta.bold("BOOT")}\n`;
+    const boxenOptions = {
+        padding: 1,
+        margin: 1,
+        borderColor: 'green',
+        borderStyle: 'classic',
+        title: `version (${version})`,
+        titleAlignment: 'center'
+    };
+
+    return boxen(textForBoxed, boxenOptions);
+}
+
+export const generateSpringBootProject = (group, artifact, projectName, selectedDeps, buildTool, javaVersion) => {
+    const dependencies = selectedDeps.join(',');
+    const url = `https://start.spring.io/starter.zip?type=${buildTool}-project&language=java&bootVersion=3.3.5&javaVersion=${javaVersion}&groupId=${group}&artifactId=${artifact}&name=${projectName}&dependencies=${dependencies}`;
+
+    try{
+        // fetch zip file
+        const buffer = execSync(`curl -sL \"${url}\"`, {encoding: 'buffer'});
+
+        // create project path
+        const projectPath = path.join(process.cwd(), projectName);
+        fsExtra.ensureDirSync(projectPath);
+
+
+        // load zip file
+        const zip = new AdmZip(Buffer.from(buffer));
+
+        // extract zip
+        zip.extractAllTo(projectPath, true);
+
+        console.log(`${chalk.green.bold('✔')} Project create successfully.`)
+    }
+    catch(error) {
+        console.log(`${chalk.red.bold('⚠')} Error creating spring boot project: `,error.message);
+    }
+}
+
 // private functions
 const generateJavaFile = (name, type, content) => {
     const javaSrcPath = path.join(process.cwd(), "src", "main", "java");
@@ -271,42 +337,4 @@ const createGlobalCommandLineConfigFile = (path) => {
     const globalCommandLineRunnerContent = globalCommandLineRunnerFileContent(classPath);
 
     fs.writeFile(`${pathToCreateFile}/GlobalCommandLineRunner.java`, globalCommandLineRunnerContent, () => { });
-}
-
-export const generateAsciiSpringBootCLIText = () => {
-    // Generate ASCII art for "Spring" and "Boot" and "CLI"
-    const springArt = figlet.textSync('Spring', { horizontalLayout: 'default', font: 'Small' });
-    const bootArt = figlet.textSync('Boot', { horizontalLayout: 'default', font: 'Small' });
-    const cliArt = figlet.textSync('CLI', { horizontalLayout: 'default', font: 'Small' });
-
-    // Split ASCII art into lines
-    const springLines = springArt.split('\n');
-    const bootLines = bootArt.split('\n');
-    const cliLines = cliArt.split('\n');
-
-    // Check arrays of lines have the same length
-    const maxLength = Math.max(springLines.length, bootLines.length, cliLines.length);
-    while (springLines.length < maxLength) springLines.push(' '.repeat(springLines[0].length));
-    while (bootLines.length < maxLength) bootLines.push(' '.repeat(bootLines[0].length));
-    while (cliLines.length < maxLength) cliLines.push(' '.repeat(cliLines[0].length));
-
-    // Combine the two ASCII art line by line
-    const combinedArt = springLines.map((line, i) => `${chalk.green(line)}  ${chalk.magenta(bootLines[i])} ${chalk.white(cliLines[i])}`).join('\n');
-
-    // Output the combined ASCII art
-    return "\n" + combinedArt + "\n";
-}
-
-export const generateBoxedText = (version) => {
-    const textForBoxed = `\nCLI like ${chalk.red.bold("LARAVEL")} for ${chalk.green.bold("SPRING")} ${chalk.magenta.bold("BOOT")}\n`;
-    const boxenOptions = {
-        padding: 1,
-        margin: 1,
-        borderColor: 'green',
-        borderStyle: 'classic',
-        title: `version (${version})`,
-        titleAlignment: 'center'
-    };
-
-    return boxen(textForBoxed, boxenOptions);
 }

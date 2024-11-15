@@ -4,6 +4,51 @@ import path from "path";
 
 const javaSrcPath = path.join(process.cwd(), "src", "main", "java");
 
+export const springBootsDependencies = [
+    // Web and REST
+    { name: 'Spring Web', value: 'web' },
+    { name: 'Spring Reactive Web', value: 'webflux' },
+    { name: 'Thymeleaf', value: 'thymeleaf' },
+    
+    // Data Access
+    { name: 'Spring Data JPA', value: 'jpa' },
+    { name: 'Spring Data MongoDB', value: 'mongodb' },
+    { name: 'Spring Data JDBC', value: 'jdbc' },
+    { name: 'Spring Data Redis', value: 'data-redis' },
+    { name: 'Spring Data Elasticsearch', value: 'data-elasticsearch' },
+    { name: 'Spring Data Cassandra', value: 'data-cassandra' },
+    { name: 'H2 Database', value: 'h2' },
+    { name: 'MySQL Driver', value: 'mysql' },
+    { name: 'PostgreSQL Driver', value: 'postgresql' },
+    
+    // Messaging
+    { name: 'Spring Kafka', value: 'kafka' },
+    { name: 'Spring AMQP (RabbitMQ)', value: 'amqp' },
+    
+    // Cloud and Distributed Systems
+    { name: 'Spring Cloud Config Client', value: 'cloud-config-client' },
+    { name: 'Spring Cloud Eureka Discovery', value: 'cloud-eureka' },
+    { name: 'Spring Cloud Gateway', value: 'cloud-gateway' },
+    { name: 'Spring Cloud OpenFeign', value: 'cloud-openfeign' },
+    { name: 'Spring Cloud Sleuth', value: 'cloud-sleuth' },
+    
+    // Security
+    { name: 'Spring Security', value: 'security' },
+    { name: 'OAuth2 Resource Server', value: 'oauth2-resource-server' },
+    { name: 'OAuth2 Client', value: 'oauth2-client' },
+    
+    // Testing
+    { name: 'Spring Boot Actuator', value: 'actuator' },
+    { name: 'Spring Boot DevTools', value: 'devtools' },
+    { name: 'Spring Boot Test', value: 'test' },
+    
+    // Miscellaneous
+    { name: 'Spring Batch', value: 'batch' },
+    { name: 'Spring Integration', value: 'integration' },
+    { name: 'Liquibase Migration', value: 'liquibase' },
+    { name: 'Flyway Migration', value: 'flyway' }
+];
+
 export const modelFileContent = (className, packageName) => {
     return "package " + packageName + ".model;\n" +
         "\n" +
