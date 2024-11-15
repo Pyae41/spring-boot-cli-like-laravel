@@ -24,7 +24,7 @@ const program = new Command();
 
 const aciiArt = generateAsciiSpringBootCLIText();
 
-const boxedText = generateBoxedText("1.0.0");
+const boxedText = generateBoxedText("1.1.0");
 
 const helpOutputInsideSpring = `${aciiArt}${boxedText}
   
