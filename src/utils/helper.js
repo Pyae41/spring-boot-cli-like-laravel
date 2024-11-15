@@ -255,14 +255,14 @@ export const generateBoxedText = (version) => {
 
 export const generateSpringBootProject = (group, artifact, projectName, selectedDeps, buildTool, javaVersion) => {
     const dependencies = selectedDeps.join(',');
-    const url = `https://start.spring.io/starter.zip?type=${buildTool}-project&language=java&bootVersion=3.3.5&javaVersion=${javaVersion}&groupId=${group}&artifactId=${artifact}&name=${projectName}&dependencies=${dependencies}`;
+    const url = `https://start.spring.io/starter.zip?type=${buildTool.toLowerCase()}-project&language=java&bootVersion=3.3.5&javaVersion=${javaVersion}&groupId=${group.toLowerCase()}&artifactId=${artifact.toLowerCase()}&name=${projectName.toLowerCase()}&dependencies=${dependencies}`;
 
     try{
         // fetch zip file
         const buffer = execSync(`curl -sL \"${url}\"`, {encoding: 'buffer'});
 
         // create project path
-        const projectPath = path.join(process.cwd(), projectName);
+        const projectPath = path.join(process.cwd(), projectName.toLowerCase());
         fsExtra.ensureDirSync(projectPath);
 
 

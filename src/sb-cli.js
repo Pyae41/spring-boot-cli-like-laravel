@@ -394,13 +394,21 @@ const initSpringBoot = program
         type: 'input',
         name: 'group',
         message: 'Enter the group ID (e.g., com.example):',
-        default: 'com.example'
+        default: 'com.example',
+        validate: (input) => {
+          const regex = /^[a-zA-Z]+(\.[a-zA-Z]+)+$/;
+          return regex.test(input) || "Please enter a valid group ID like example"
+        }
       },
       {
         type: 'input',
         name: 'artifact',
-        message: 'Enter the artifact ID (e.g., my-spring-project):',
-        default: 'my-spring-project'
+        message: 'Enter the artifact ID (e.g., demo):',
+        default: 'demo',
+        validate: (input) => {
+          const regex = /^[a-zA-Z]$/;
+          return regex.test(input) || "Please enter a valid artifactId like example"
+        }
       },
       {
         type: 'input',
